@@ -1,0 +1,2 @@
+﻿#include "OGCharacter.h"
+
