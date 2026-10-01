@@ -1,6 +1,6 @@
 # ORGEL 아트 전달 작업공간
 
-작업 브랜치: `codex/art-assets`. 팀 프로젝트의 `EngineAssociation`은 `5.8`이며, 로컬 준비 환경은 UE 5.8.3입니다. 팀 에셋의 기존 저장 버전 5.8.2와 개발자의 현재 설치 버전은 구분합니다. 기존 Source·Config·Content 에셋은 이 준비 작업에서 변경하지 않습니다.
+작업 브랜치: `art/khjhin7962`. 팀 프로젝트의 `EngineAssociation`은 `5.8`이며, 로컬 준비 환경은 UE 5.8.3입니다. 팀 에셋의 기존 저장 버전 5.8.2와 개발자의 현재 설치 버전은 구분합니다. 기존 Source·Config·Content 에셋은 이 준비 작업에서 변경하지 않습니다.
 
 ## 에셋 반입 위치
 
