@@ -4,6 +4,9 @@
 # JetBrains IDE user specific files
 .idea/
 
+# Local agent instructions
+AGENTS.md
+
 # Compiled Object files
 *.slo
 *.lo
