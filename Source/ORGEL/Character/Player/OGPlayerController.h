@@ -27,6 +27,12 @@ private:
 	/** 컨트롤러가 등록한 입력 매핑과 설정 화면을 정리합니다. */
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	/** 한 프레임의 입력 수집 후 ASC의 어빌리티 입력을 처리합니다. */
+	virtual void PostProcessInput(float DeltaTime, bool bGamePaused) override;
+
+	/** 포커스 변경이나 일시정지로 키를 비울 때 ASC의 입력도 정리합니다. */
+	virtual void FlushPressedKeys() override;
+
 	/** 일시정지 액션을 컨트롤러 입력에 바인딩합니다. */
 	virtual void SetupInputComponent() override;
 
@@ -38,6 +44,10 @@ public:
 	/** 설정 화면 표시와 게임 일시정지 상태를 함께 전환합니다. */
 	void ToggleSettings();
 
+
+// ─────────────────────────────────────────────────────────────
+// Settings Variables
+// ─────────────────────────────────────────────────────────────
 private:
 	/** 일시정지 시 표시할 설정 위젯 클래스를 참조합니다. */
 	UPROPERTY(EditDefaultsOnly, Category = "변수|설정")
@@ -49,7 +59,7 @@ private:
 
 
 // ─────────────────────────────────────────────────────────────
-// Input
+// Input Variables
 // ─────────────────────────────────────────────────────────────
 private:
 	/** 로컬 플레이어에 등록할 기본 키와 입력 액션의 매핑을 참조합니다. */

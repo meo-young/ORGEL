@@ -1,4 +1,7 @@
-﻿#include "OGPlayerController.h"
+#include "OGPlayerController.h"
+
+#include "AbilitySystem/ORAbilitySystemComponent.h"
+#include "OGPlayerState.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
@@ -65,6 +68,36 @@ void AOGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 
 	Super::EndPlay(EndPlayReason);
+}
+
+void AOGPlayerController::PostProcessInput(float DeltaTime, bool bGamePaused)
+{
+	// 플레이어 상태가 준비된 로컬 플레이어만 입력 처리 대상으로 사용합니다.
+	if (const AOGPlayerState* ORPlayerState = GetPlayerState<AOGPlayerState>())
+	{
+		UORAbilitySystemComponent* ASC = CastChecked<UORAbilitySystemComponent>(ORPlayerState->GetAbilitySystemComponent());
+		if (bGamePaused)
+		{
+			ASC->ClearAbilityInput();
+		}
+		else
+		{
+			ASC->ProcessAbilityInput();
+		}
+	}
+
+	Super::PostProcessInput(DeltaTime, bGamePaused);
+}
+
+void AOGPlayerController::FlushPressedKeys()
+{
+	Super::FlushPressedKeys();
+
+	// 엔진 입력이 비워진 뒤 ASC에 남아 있는 Hold 상태도 함께 정리합니다.
+	if (const AOGPlayerState* ORPlayerState = GetPlayerState<AOGPlayerState>())
+	{
+		CastChecked<UORAbilitySystemComponent>(ORPlayerState->GetAbilitySystemComponent())->ClearAbilityInput();
+	}
 }
 
 void AOGPlayerController::SetupInputComponent()
