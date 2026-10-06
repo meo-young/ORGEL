@@ -7,6 +7,9 @@
 # Local agent instructions
 AGENTS.md
 
+# Generated output
+output/
+
 # Compiled Object files
 *.slo
 *.lo
@@ -41,6 +44,7 @@ AGENTS.md
 *.xcodeproj
 *.xcworkspace
 *.sln
+*.slnx
 *.suo
 *.opensdf
 *.sdf
@@ -78,3 +82,9 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Local documentation and IDE settings
+Docs/
+*.DotSettings.user
+DoSettings.user
+.vsconfig
