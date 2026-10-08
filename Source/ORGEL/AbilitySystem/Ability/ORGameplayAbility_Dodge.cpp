@@ -19,6 +19,7 @@ UORGameplayAbility_Dodge::UORGameplayAbility_Dodge()
 
 	// 구르기 동안 일반 이동과 조준을 차단하고 종료 후 구르기만 제한합니다.
 	{
+		ActivationOwnedTags.AddTag(ORGameplayTags::Gameplay_InteractionBlocked);
 		ActivationOwnedTags.AddTag(ORGameplayTags::Status_Dodging);
 		ActivationOwnedTags.AddTag(ORGameplayTags::Gameplay_MovementStopped);
 		ActivationBlockedTags.AddTag(ORGameplayTags::Gameplay_MovementStopped);

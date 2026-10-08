@@ -4,6 +4,7 @@
 #include "ORGEL/Character/OGCharacter.h"
 #include "OGPlayer.generated.h"
 
+class UInteractionComponent;
 class UOGSpringArmComponent;
 class UOGCameraComponent;
 class UORInputConfig;
@@ -82,7 +83,7 @@ private:
 
 
 // ─────────────────────────────────────────────────────────────
-// Camera Variables
+// Components
 // ─────────────────────────────────────────────────────────────
 private:
 	/** 캐릭터 회전과 독립적으로 카메라의 거리와 각도를 유지합니다. */
@@ -92,4 +93,17 @@ private:
 	/** 플레이어 중심을 추적하는 고정 시점 카메라를 참조합니다. */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UOGCameraComponent> CameraComponent;
+	
+	/** 주변 상호작용 후보를 탐색하고 현재 대상을 관리하는 컴포넌트를 참조합니다. */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UInteractionComponent> InteractionComponent;
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Getter
+// ─────────────────────────────────────────────────────────────
+public:
+	/** 플레이어의 상호작용 대상 탐색 컴포넌트를 반환합니다. */
+	FORCEINLINE UInteractionComponent* GetInteractionComponent() const { return InteractionComponent; };
+	
 };

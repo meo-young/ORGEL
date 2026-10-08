@@ -11,7 +11,8 @@ namespace ORGameplayTags
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Move);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Dodge);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Attack);
-
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Interact);
+	
 
 // ─────────────────────────────────────────────────────────────
 // Character Status
@@ -28,6 +29,13 @@ namespace ORGameplayTags
 	// 캐릭터의 이동과 회전을 제한합니다.
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Gameplay_MovementStopped);
 
+	
+// ─────────────────────────────────────────────────────────────
+// Interaction Restrictions
+// ─────────────────────────────────────────────────────────────
+	// 행동 제한 상태에서 상호작용 어빌리티의 발동을 차단합니다.
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Gameplay_InteractionBlocked);
+	
 
 // ─────────────────────────────────────────────────────────────
 // Ability Cooldown

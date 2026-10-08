@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "Interact/InteractionComponent.h"
 
 AOGPlayer::AOGPlayer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -39,6 +40,11 @@ AOGPlayer::AOGPlayer(const FObjectInitializer& ObjectInitializer) : Super(Object
 		CameraComponent = CreateDefaultSubobject<UOGCameraComponent>(TEXT("CameraComponent"));
 		CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 		CameraComponent->bUsePawnControlRotation = false;
+	}
+
+	// 캐릭터의 위치와 수명에 맞춰 상호작용 탐색 컴포넌트를 생성합니다.
+	{
+		InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 	}
 
 	// 입력 액션과 태그의 연결은 공통 입력 설정 에셋에서 관리합니다.

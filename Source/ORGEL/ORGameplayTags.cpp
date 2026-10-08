@@ -9,6 +9,7 @@ namespace ORGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Move, "InputTag.Move");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Dodge, "InputTag.Dodge");
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Attack, "InputTag.Attack");
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_Interact, "InputTag.Interact");
 
 
 // ─────────────────────────────────────────────────────────────
@@ -25,6 +26,13 @@ namespace ORGameplayTags
 // ─────────────────────────────────────────────────────────────
 	// 캐릭터의 이동과 회전을 제한합니다.
 	UE_DEFINE_GAMEPLAY_TAG(Gameplay_MovementStopped, "Gameplay.MovementStopped");
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Interaction Restrictions
+// ─────────────────────────────────────────────────────────────
+	// 행동 제한 상태에서 상호작용 어빌리티의 발동을 차단합니다.
+	UE_DEFINE_GAMEPLAY_TAG(Gameplay_InteractionBlocked, "Gameplay.InteractionBlocked");
 
 
 // ─────────────────────────────────────────────────────────────
