@@ -21,18 +21,22 @@ namespace ORGameplayTags
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Moving);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Dodging);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable);
+	
+	
+// ─────────────────────────────────────────────────────────────
+// SetByCaller Data
+// ─────────────────────────────────────────────────────────────
+	// 피해와 회복 효과에 전달할 수치의 식별자를 선언합니다.
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Damage);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(SetByCaller_Healing);
 
 
 // ─────────────────────────────────────────────────────────────
-// Movement Restrictions
+// Restrictions
 // ─────────────────────────────────────────────────────────────
 	// 캐릭터의 이동과 회전을 제한합니다.
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Gameplay_MovementStopped);
 
-	
-// ─────────────────────────────────────────────────────────────
-// Interaction Restrictions
-// ─────────────────────────────────────────────────────────────
 	// 행동 제한 상태에서 상호작용 어빌리티의 발동을 차단합니다.
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Gameplay_InteractionBlocked);
 	
