@@ -4,12 +4,31 @@
 #include "GameplayEffectExtension.h"
 
 UORHealthSet::UORHealthSet()
-	: Health(100.0f)
-	, MaxHealth(100.0f)
+	: Health(1.0f)
+	, MaxHealth(1.0f)
+	, Healing(0.0f)
+	, Damage(0.0f)
+	, bOutOfHealth(false)
 {
+}
+
+void UORHealthSet::InitializeHealth(float InMaxHealth)
+{
+	// 명시적인 초기화에서만 사망 상태를 해제합니다.
 	bOutOfHealth = false;
-	MaxHealthBeforeAttributeChange = 0.0f;
-	HealthBeforeAttributeChange = 0.0f;
+
+	// 등록된 ASC를 통해 최대 체력과 현재 체력을 같은 값으로 설정합니다.
+	UORAbilitySystemComponent* ASC = GetORAbilitySystemComponent();
+	const float InitialMaxHealth = FMath::Max(InMaxHealth, 1.0f);
+	ASC->SetNumericAttributeBase(GetMaxHealthAttribute(), InitialMaxHealth);
+	ASC->SetNumericAttributeBase(GetHealthAttribute(), InitialMaxHealth);
+
+	// 초기화 시 피해와 회복의 임시 계산값을 비웁니다.
+	ASC->SetNumericAttributeBase(GetHealingAttribute(), 0.0f);
+	ASC->SetNumericAttributeBase(GetDamageAttribute(), 0.0f);
+
+	// 기존 초기화 확인 로그를 유지합니다.
+	UE_LOG(LogTemp, Warning, TEXT("%f health"), InitialMaxHealth);
 }
 
 bool UORHealthSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)

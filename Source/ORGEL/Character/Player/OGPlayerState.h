@@ -7,7 +7,8 @@
 
 class UORAbilitySet;
 class UORAbilitySystemComponent;
-class UORAttributeSet;
+class UORCharacterStatData;
+class UORHealthSet;
 
 UCLASS()
 class ORGEL_API AOGPlayerState : public APlayerState, public IAbilitySystemInterface
@@ -18,11 +19,11 @@ class ORGEL_API AOGPlayerState : public APlayerState, public IAbilitySystemInter
 // Lifecycle
 // ─────────────────────────────────────────────────────────────
 public:
-	/** 플레이어가 소유할 ASC와 기본 능력치 세트를 생성합니다. */
+	/** 플레이어가 소유할 ASC와 체력 속성 세트를 생성합니다. */
 	AOGPlayerState();
 
 private:
-	/** 기본 어빌리티 세트를 한 번 부여합니다. */
+	/** 최초 체력을 초기화하고 기본 어빌리티 세트를 부여합니다. */
 	virtual void BeginPlay() override;
 
 
@@ -35,18 +36,28 @@ public:
 
 
 // ─────────────────────────────────────────────────────────────
-// Ability System Variables
+// Components
 // ─────────────────────────────────────────────────────────────
 private:
-	/** 캐릭터 교체 후에도 어빌리티를 유지할 ASC를 소유합니다. */
+	/** 캐릭터 교체 후에도 능력치와 어빌리티를 유지할 ASC를 소유합니다. */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UORAbilitySystemComponent> ASC;
 
-	/** 플레이어의 GAS 능력치를 관리할 기본 속성 세트를 소유합니다. */
-	UPROPERTY(VisibleAnywhere, Category = "변수|능력치")
-	TObjectPtr<UORAttributeSet> AttributeSet;
+	/** 현재 체력과 최대 체력을 유지할 체력 속성 세트를 소유합니다. */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UORHealthSet> AttributeSet;
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Ability System Variables
+// ─────────────────────────────────────────────────────────────
+private:
+	/** 플레이어 최초 생성 시 적용할 필수 초기 스탯 데이터를 참조합니다. */
+	UPROPERTY(EditDefaultsOnly, Category = "변수|초기능력치")
+	TObjectPtr<UORCharacterStatData> InitialStatData;
 
 	/** 플레이어 상태가 시작될 때 한 번 부여할 기본 어빌리티 세트를 참조합니다. */
 	UPROPERTY(EditDefaultsOnly, Category = "변수|어빌리티")
-	TArray<TSoftObjectPtr<UORAbilitySet>> DefaultAbilitySets;
+	TSoftObjectPtr<UORAbilitySet> DefaultAbilitySet;
+	
 };
