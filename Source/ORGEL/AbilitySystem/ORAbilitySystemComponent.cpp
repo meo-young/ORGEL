@@ -256,6 +256,29 @@ void UORAbilitySystemComponent::CancelAllAbilities()
 	ClearAbilityInput();
 }
 
+FActiveGameplayEffectHandle UORAbilitySystemComponent::AddTimedTag(const FGameplayTag& Tag, float Duration)
+{
+	// 유효한 태그와 유한한 양수 지속시간만 허용합니다.
+	if (!Tag.IsValid() || !FMath::IsFinite(Duration) || Duration <= 0.0f)
+	{
+		return FActiveGameplayEffectHandle();
+	}
+
+	// 이번 적용에 사용할 기본 GameplayEffect 객체를 생성합니다.
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, NAME_None, RF_Transient);
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	Effect->DurationMagnitude = FScalableFloat(Duration);
+	Effect->Period = FScalableFloat(0.0f);
+
+	// 생성한 효과를 직접 참조하는 명세에 지속시간과 부여할 태그를 설정합니다.
+	FGameplayEffectSpec Spec(Effect, MakeEffectContext(), 1.0f);
+	Spec.SetDuration(Duration, true);
+	Spec.DynamicGrantedTags.AddTag(Tag);
+
+	// 효과가 만료되면 해당 효과가 부여한 태그도 자동으로 회수하도록 적용합니다.
+	return ApplyGameplayEffectSpecToSelf(Spec);
+}
+
 bool UORAbilitySystemComponent::IsActivationGroupBlocked(EORAbilityActivationGroup Group) const
 {
 	// 독립 그룹은 허용하고 배타적 그룹은 차단 그룹의 활성 개수를 확인합니다.

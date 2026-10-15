@@ -59,6 +59,9 @@ public:
 
 	/** 활성 어빌리티 인스턴스를 강제로 취소하고 저장된 입력을 정리합니다. */
 	void CancelAllAbilities();
+	
+	/** 태그를 지정한 시간 동안 부여하고 개별 회수용 효과 핸들을 반환합니다. */
+	FActiveGameplayEffectHandle AddTimedTag(const FGameplayTag& Tag, float Duration);
 
 
 // ─────────────────────────────────────────────────────────────
