@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/ORAbilitySystemComponent.h"
 #include "AbilitySystem/Attribute/ORHealthSet.h"
+#include "AbilitySystem/Attribute/ORMovementSet.h"
 #include "Data/ORCharacterStatData.h"
 
 AOGEnemy::AOGEnemy(const FObjectInitializer& ObjectInitializer)
@@ -11,17 +12,19 @@ AOGEnemy::AOGEnemy(const FObjectInitializer& ObjectInitializer)
 	{
 		ASC = CreateDefaultSubobject<UORAbilitySystemComponent>(TEXT("ASC"));
 		HealthSet = CreateDefaultSubobject<UORHealthSet>(TEXT("HealthSet"));
+		MovementSet = CreateDefaultSubobject<UORMovementSet>(TEXT("MovementSet"));
 	}
 }
 
 void AOGEnemy::BeginPlay()
 {
-	// Blueprint 시작 처리 전에 몬스터를 소유자와 아바타로 연결하고 체력을 준비합니다.
+	// Blueprint 시작 처리 전에 ASC와 공통 능력치를 준비합니다.
 	ASC->InitAbilityActorInfo(this, this);
-	ASC->AddAttributeSetSubobject(HealthSet.Get());
-	HealthSet->InitializeHealth(InitialStatData->GetMaxHealth());
-	
-	// 초기 체력을 설정한 다음 체력 고갈 이벤트를 연결합니다.
+
+	// 생성자에서 생성되어 자동 등록된 속성 세트를 초기화합니다.
+	ASC->InitializeAttributeSets(*InitialStatData);
+
+	// 초기 체력을 설정한 다음 사망 이벤트를 연결합니다.
 	BindHealthEvents();
 
 	Super::BeginPlay();

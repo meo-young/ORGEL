@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "ORGameplayTags.h"
+#include "AbilitySystem/Attribute/ORMovementSet.h"
 
 float UOGCharacterMovementComponent::GetMaxSpeed() const
 {
@@ -12,6 +13,15 @@ float UOGCharacterMovementComponent::GetMaxSpeed() const
 		if (ASC->HasMatchingGameplayTag(ORGameplayTags::Gameplay_MovementStopped))
 		{
 			return 0.0f;
+		}
+		
+		// 지상 이동과 낙하 중 수평 이동에는 현재 이동속도를 사용합니다.
+		if (IsMovingOnGround() || IsFalling())
+		{
+			if (const UORMovementSet* MovementSet = ASC->GetSet<UORMovementSet>())
+			{
+				return MovementSet->GetMovementSpeed();
+			}
 		}
 	}
 

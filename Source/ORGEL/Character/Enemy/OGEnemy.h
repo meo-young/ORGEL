@@ -4,6 +4,7 @@
 #include "Character/OGCharacter.h"
 #include "OGEnemy.generated.h"
 
+class UORMovementSet;
 class UORCharacterStatData;
 class UORHealthSet;
 
@@ -25,13 +26,22 @@ protected:
 
 
 // ─────────────────────────────────────────────────────────────
-// Health Variables
+// Component
 // ─────────────────────────────────────────────────────────────
 private:
 	/** 몬스터의 현재 체력과 최대 체력을 관리할 속성 세트를 소유합니다. */
-	UPROPERTY(VisibleAnywhere, Category = "변수|능력치")
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UORHealthSet> HealthSet;
+	
+	/** 몬스터의 기본 이동속도와 이동속도 효과를 관리할 속성 세트를 소유합니다. */
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UORMovementSet> MovementSet;
 
+	
+// ─────────────────────────────────────────────────────────────
+// Ability System Variables
+// ─────────────────────────────────────────────────────────────
+private:
 	/** 몬스터 최초 생성 시 적용할 필수 초기 스탯 데이터를 참조합니다. */
 	UPROPERTY(EditDefaultsOnly, Category = "변수|초기능력치")
 	TObjectPtr<UORCharacterStatData> InitialStatData;

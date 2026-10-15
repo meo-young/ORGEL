@@ -2,6 +2,7 @@
 
 #include "GameplayEffect.h"
 #include "ORGameplayTags.h"
+#include "Attribute/ORAttributeSet.h"
 
 void UORAbilitySystemComponent::NotifyAbilityActivated(FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability)
 {
@@ -215,6 +216,18 @@ void UORAbilitySystemComponent::ClearAbilityInput()
 			{
 				CancelAbilityHandle(Spec.Handle);
 			}
+		}
+	}
+}
+
+void UORAbilitySystemComponent::InitializeAttributeSets(const UORCharacterStatData& StatData)
+{
+	// 등록된 세트 중 공통 초기화 규약을 사용하는 프로젝트 세트를 초기화합니다.
+	for (UAttributeSet* Set : GetSpawnedAttributes())
+	{
+		if (UORAttributeSet* ORSet = Cast<UORAttributeSet>(Set))
+		{
+			ORSet->InitializeSet(StatData);
 		}
 	}
 }

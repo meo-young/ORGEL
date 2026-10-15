@@ -3,6 +3,7 @@
 #include "AbilitySystem/ORAbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
 #include "ORGameplayTags.h"
+#include "Data/ORCharacterStatData.h"
 
 UORHealthSet::UORHealthSet()
 	: Health(1.0f)
@@ -13,18 +14,18 @@ UORHealthSet::UORHealthSet()
 {
 }
 
-void UORHealthSet::InitializeHealth(float InMaxHealth)
+void UORHealthSet::InitializeSet(const UORCharacterStatData& StatData)
 {
-	// 명시적인 초기화에서만 사망 상태를 해제합니다.
+	// 명시적인 초기화에서 사망 상태를 해제합니다.
 	bOutOfHealth = false;
 
-	// 최대 체력을 최소 1 HP로 보정하고, ASC를 통해 최대 체력과 현재 체력을 초기화합니다.
+	// 최대 체력을 최소 1 HP로 보정하고 현재 체력도 같은 값으로 초기화합니다.
 	UORAbilitySystemComponent* ASC = GetORAbilitySystemComponent();
-	const float InitialMaxHealth = FMath::Max(InMaxHealth, 1.0f);
+	const float InitialMaxHealth = FMath::Max(StatData.GetMaxHealth(), 1.0f);
 	ASC->SetNumericAttributeBase(GetMaxHealthAttribute(), InitialMaxHealth);
 	ASC->SetNumericAttributeBase(GetHealthAttribute(), InitialMaxHealth);
 
-	// 이전 피해와 회복의 임시 계산값이 남지 않도록 초기화합니다.
+	// 이전 효과의 임시 계산값이 남지 않도록 초기화합니다.
 	ASC->SetNumericAttributeBase(GetHealingAttribute(), 0.0f);
 	ASC->SetNumericAttributeBase(GetDamageAttribute(), 0.0f);
 

@@ -16,8 +16,8 @@ public:
 	/** 캐릭터별 초기값 적용 전 사용할 기본 체력 상태를 구성합니다. */
 	UORHealthSet();
 
-	/** 최초 생성 시 최대 체력과 현재 체력을 설정하고 임시 계산 상태를 초기화합니다. */
-	void InitializeHealth(float InMaxHealth);
+	/** 초기 데이터로 체력을 설정하고 사망 상태와 임시 계산값을 초기화합니다. */
+	virtual void InitializeSet(const UORCharacterStatData& StatData) override;
 
 
 // ─────────────────────────────────────────────────────────────

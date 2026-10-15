@@ -5,6 +5,8 @@
 #include "Ability/ORGameplayAbility.h"
 #include "ORAbilitySystemComponent.generated.h"
 
+class UORCharacterStatData;
+
 UCLASS()
 class ORGEL_API UORAbilitySystemComponent : public UAbilitySystemComponent
 {
@@ -52,7 +54,10 @@ public:
 // Ability Interface
 // ─────────────────────────────────────────────────────────────
 public:
-	/**  */
+	/** 등록된 프로젝트 속성 세트에 초기 스탯 데이터를 적용합니다. */
+	void InitializeAttributeSets(const UORCharacterStatData& StatData);
+
+	/** 활성 어빌리티 인스턴스를 강제로 취소하고 저장된 입력을 정리합니다. */
 	void CancelAllAbilities();
 
 

@@ -5,6 +5,7 @@
 #include "AttributeSet.h"
 #include "ORAttributeSet.generated.h"
 
+class UORCharacterStatData;
 struct FGameplayEffectSpec;
 class UORAbilitySystemComponent;
 
@@ -17,10 +18,17 @@ class UORAbilitySystemComponent;
 /** 능력치의 실제 변화량과 변경 전후 값을 전달합니다. */
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FORAttributeEvent, float /*ChangeAmount*/, float /*OldValue*/, float /*NewValue*/);
 
-UCLASS()
+UCLASS(Abstract)
 class ORGEL_API UORAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
+	
+// ─────────────────────────────────────────────────────────────
+// Initialization
+// ─────────────────────────────────────────────────────────────
+public:
+	/** 초기 스탯 데이터에서 해당 세트가 담당하는 능력치를 초기화합니다. */
+	virtual void InitializeSet(const UORCharacterStatData& StatData) PURE_VIRTUAL(UORAttributeSet::InitializeSet, );
 
 // ─────────────────────────────────────────────────────────────
 // Attribute Changes

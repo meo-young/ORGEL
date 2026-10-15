@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerState.h"
 #include "OGPlayerState.generated.h"
 
+class UORMovementSet;
 class UORAbilitySet;
 class UORAbilitySystemComponent;
 class UORCharacterStatData;
@@ -45,7 +46,11 @@ private:
 
 	/** 현재 체력과 최대 체력을 유지할 체력 속성 세트를 소유합니다. */
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UORHealthSet> AttributeSet;
+	TObjectPtr<UORHealthSet> HealthSet;
+	
+	/** 같은 런에서 기본 이동속도와 이동속도 효과를 유지할 속성 세트를 소유합니다. */
+	UPROPERTY(VisibleAnywhere, Category = "변수|능력치")
+	TObjectPtr<UORMovementSet> MovementSet;
 	
 	
 // ─────────────────────────────────────────────────────────────
