@@ -20,9 +20,16 @@ namespace ORGameplayTags
 	// 캐릭터의 현재 상태를 표현합니다.
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Moving);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Dodging);
-	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Dead);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_DeathFinished);
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Invulnerable Status
+// ─────────────────────────────────────────────────────────────
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable_Dodge);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable_Hit);
 	
 	
 // ─────────────────────────────────────────────────────────────

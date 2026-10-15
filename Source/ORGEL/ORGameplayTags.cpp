@@ -18,9 +18,16 @@ namespace ORGameplayTags
 	// 캐릭터의 현재 상태를 표현합니다.
 	UE_DEFINE_GAMEPLAY_TAG(Status_Moving, "Status.Moving");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dodging, "Status.Dodging");
-	UE_DEFINE_GAMEPLAY_TAG(Status_Invulnerable, "Status.Invulnerable");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dead, "Status.Dead");
 	UE_DEFINE_GAMEPLAY_TAG(Status_DeathFinished, "Status.DeathFinished");
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Invulnerable Status
+// ─────────────────────────────────────────────────────────────
+	UE_DEFINE_GAMEPLAY_TAG(Status_Invulnerable, "Status.Invulnerable");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Invulnerable_Dodge, "Status.Invulnerable.Dodge");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Invulnerable_Hit, "Status.Invulnerable.Hit");
 	
 	
 // ─────────────────────────────────────────────────────────────

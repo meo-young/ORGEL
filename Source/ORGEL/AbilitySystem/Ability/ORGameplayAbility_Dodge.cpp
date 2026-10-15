@@ -22,6 +22,7 @@ UORGameplayAbility_Dodge::UORGameplayAbility_Dodge()
 	{
 		ActivationOwnedTags.AddTag(ORGameplayTags::Gameplay_InteractionBlocked);
 		ActivationOwnedTags.AddTag(ORGameplayTags::Status_Dodging);
+		ActivationOwnedTags.AddTag(ORGameplayTags::Status_Invulnerable_Dodge);
 		ActivationOwnedTags.AddTag(ORGameplayTags::Gameplay_MovementStopped);
 		ActivationBlockedTags.AddTag(ORGameplayTags::Gameplay_MovementStopped);
 	}
@@ -66,6 +67,13 @@ void UORGameplayAbility_Dodge::EndAbility(FGameplayAbilitySpecHandle Handle, con
 		MovementTask->OnFinish.RemoveDynamic(this, &ThisClass::K2_EndAbility);
 		MovementTask->EndTask();
 		MovementTask = nullptr;
+		
+		// 구르기가 정상적으로 종료되면 추가 무적을 부여합니다.
+		if (!bWasCancelled)
+		{
+			GetORAbilitySystemComponentFromActorInfo()->AddTimedTag(ORGameplayTags::Status_Invulnerable_Dodge, 0.1f);
+		}
+		
 		ApplyCooldown(Handle, ActorInfo, ActivationInfo);
 	}
 	
