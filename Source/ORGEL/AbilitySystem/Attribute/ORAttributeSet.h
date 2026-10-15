@@ -14,8 +14,8 @@ class UORAbilitySystemComponent;
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-/** 능력치 변경의 유발자, 원인 액터, 효과 명세, 효과 크기와 변경 전후 값을 전달합니다. */
-DECLARE_MULTICAST_DELEGATE_SixParams(FORAttributeEvent, AActor* /*EffectInstigator*/, AActor* /*EffectCauser*/, const FGameplayEffectSpec* /*EffectSpec*/, float /*EffectMagnitude*/, float /*OldValue*/, float /*NewValue*/);
+/** 능력치의 실제 변화량과 변경 전후 값을 전달합니다. */
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FORAttributeEvent, float /*ChangeAmount*/, float /*OldValue*/, float /*NewValue*/);
 
 UCLASS()
 class ORGEL_API UORAttributeSet : public UAttributeSet
@@ -26,11 +26,12 @@ class ORGEL_API UORAttributeSet : public UAttributeSet
 // Attribute Changes
 // ─────────────────────────────────────────────────────────────
 public:
-	/** 기본 능력치가 변경되기 전에 허용 범위를 적용합니다. */
+	virtual bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override;
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
-
-	/** 효과가 반영된 현재 능력치에 허용 범위를 적용합니다. */
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+	virtual void PostAttributeBaseChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) const override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 protected:
 	/** 파생 능력치 세트에서 속성별 허용 범위를 적용합니다. */

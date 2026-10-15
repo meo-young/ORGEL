@@ -18,13 +18,13 @@ void UORHealthSet::InitializeHealth(float InMaxHealth)
 	// 명시적인 초기화에서만 사망 상태를 해제합니다.
 	bOutOfHealth = false;
 
-	// 등록된 ASC를 통해 최대 체력과 현재 체력을 같은 값으로 설정합니다.
+	// 최대 체력을 최소 1 HP로 보정하고, ASC를 통해 최대 체력과 현재 체력을 초기화합니다.
 	UORAbilitySystemComponent* ASC = GetORAbilitySystemComponent();
 	const float InitialMaxHealth = FMath::Max(InMaxHealth, 1.0f);
 	ASC->SetNumericAttributeBase(GetMaxHealthAttribute(), InitialMaxHealth);
 	ASC->SetNumericAttributeBase(GetHealthAttribute(), InitialMaxHealth);
 
-	// 초기화 시 피해와 회복의 임시 계산값을 비웁니다.
+	// 이전 피해와 회복의 임시 계산값이 남지 않도록 초기화합니다.
 	ASC->SetNumericAttributeBase(GetHealingAttribute(), 0.0f);
 	ASC->SetNumericAttributeBase(GetDamageAttribute(), 0.0f);
 
@@ -34,38 +34,26 @@ void UORHealthSet::InitializeHealth(float InMaxHealth)
 
 bool UORHealthSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
 {
-	// --- 1. 공통 적용 조건 검사 ---------------------------------
 	if (!Super::PreGameplayEffectExecute(Data))
 	{
 		return false;
 	}
 	
-	// 사망이 확정된 대상에게는 추가 속성 수정을 적용하지 않습니다.
+	// 사망이 확정된 대상에게는 이번 속성 수정을 실행하지 않습니다.
 	if (bOutOfHealth)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[%s] 사망이 확정된 대상의 속성 수정을 거부합니다. 속성: %s"), *GetNameSafe(GetOwningActor()), *Data.EvaluatedData.Attribute.GetName());
+		UE_LOG(LogTemp, Warning, TEXT("[%s] 사망이 확정된 대상의 속성 수정을 거부합니다. 속성: %s"), *GetNameSafe(GetOwningActor()), *Data.EvaluatedData.Attribute.GetName());
 		return false;
 	}
 	
-	// 현재 체력의 직접 수정을 차단하고 피해 또는 회복 속성을 사용하도록 제한합니다.
+	// 실행되는 효과가 Health를 직접 수정하지 않도록 Damage 또는 Healing 사용을 강제합니다.
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		UE_LOG(LogTemp, Error, TEXT("[%s] Health 직접 수정을 거부합니다. Damage 또는 Healing 속성을 사용해야 합니다."), *GetNameSafe(GetOwningActor()));
 		return false;
 	}
-	// -----------------------------------------------------------
-	
-	
-	// --- 2. 속성별 유효성 검사 -----------------------------------
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	else if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		// 피해량은 유한한 양수이며 기본값에 더하는 방식이어야 합니다.
-		if (!FMath::IsFinite(Data.EvaluatedData.Magnitude) || Data.EvaluatedData.Magnitude <= 0.0f || Data.EvaluatedData.ModifierOp != EGameplayModOp::AddBase)
-		{
-			UE_LOG(LogTemp, Error, TEXT("[%s] 유효하지 않은 피해 효과를 거부합니다. 피해량: %g, 연산: %d"), *GetNameSafe(GetOwningActor()), Data.EvaluatedData.Magnitude, static_cast<int32>(Data.EvaluatedData.ModifierOp.GetValue()));
-			return false;
-		}
-		
 		// 무적 상태의 대상에게는 피해를 적용하지 않습니다.
 		if (GetORAbilitySystemComponent()->HasMatchingGameplayTag(ORGameplayTags::Status_Invulnerable))
 		{
@@ -75,20 +63,8 @@ bool UORHealthSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealingAttribute())
 	{
-		// 회복량은 유한한 양수이며 기본값에 더하는 방식이어야 합니다.
-		if (!FMath::IsFinite(Data.EvaluatedData.Magnitude) || Data.EvaluatedData.Magnitude <= 0.0f || Data.EvaluatedData.ModifierOp != EGameplayModOp::AddBase)
-		{
-			UE_LOG(LogTemp, Error, TEXT("[%s] 유효하지 않은 회복 효과를 거부합니다. 회복량: %g, 연산: %d"), *GetNameSafe(GetOwningActor()), Data.EvaluatedData.Magnitude, static_cast<int32>(Data.EvaluatedData.ModifierOp.GetValue()));
-			return false;
-		}
+		// 
 	}
-	// -----------------------------------------------------------
-	
-	
-	// --- 3. 변경 전 상태 저장 -----------------------------------
-	HealthBeforeAttributeChange = GetHealth();
-	MaxHealthBeforeAttributeChange = GetMaxHealth();
-	// -----------------------------------------------------------
 	
 	return true;
 }
@@ -97,69 +73,54 @@ void UORHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDat
 {
 	Super::PostGameplayEffectExecute(Data);
 	
-	// --- 1. 효과 정보 및 변경 전 상태 보관 ----------------------------------
-	// 중첩 효과가 멤버 값을 덮어써도 이번 효과의 이전 값을 유지합니다.
-	const float OldHealth = HealthBeforeAttributeChange;
-	const float OldMaxHealth = MaxHealthBeforeAttributeChange;
-	
-	// 예: 플레이어가 발사한 총알이 적중 → Instigator : 플레이어 / Causer : 총알
-	const FGameplayEffectContextHandle& EffectContext = Data.EffectSpec.GetEffectContext();
-	AActor* Instigator = EffectContext.GetOriginalInstigator();
-	AActor* Causer = EffectContext.GetEffectCauser();
-	// -----------------------------------------------------------
-	
-	
-	// --- 2. 속성별 효과 반영 ------------------------------------
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), 0.0f, GetMaxHealth()));
 		SetDamage(0.0f);
+		SetHealth(FMath::Clamp(GetHealth() - Data.EvaluatedData.Magnitude, 0.0f, GetMaxHealth()));
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealingAttribute())
 	{
-		SetHealth(FMath::Clamp(GetHealth() + GetHealing(), 0.0f, GetMaxHealth()));
 		SetHealing(0.0f);
+		SetHealth(FMath::Clamp(GetHealth() + Data.EvaluatedData.Magnitude, 0.0f, GetMaxHealth()));
 	}
-	
-	// 첫 이벤트를 전달하기 전에 이번 효과의 처리 결과를 고정합니다.
-	const float NewHealth = GetHealth();
-	const float NewMaxHealth = GetMaxHealth();
-	// -----------------------------------------------------------
-	
-	
-	// --- 3. 체력 변경 및 소진 알림 ------------------------------
-	if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
-	{
-		OnMaxHealthChanged.Broadcast(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude, OldMaxHealth, NewMaxHealth);
-	}
-	
-	if (NewHealth != OldHealth)
-	{
-		if ((NewHealth <= 0.0f) && !bOutOfHealth)
-		{
-			bOutOfHealth = true;
-			OnOutOfHealth.Broadcast(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude, OldHealth, NewHealth);
-		}
-		
-		OnHealthChanged.Broadcast(Instigator, Causer, &Data.EffectSpec, Data.EvaluatedData.Magnitude, OldHealth, NewHealth);
-	}
-	// -----------------------------------------------------------
 }
 
 void UORHealthSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 	
-	if (Attribute == GetMaxHealthAttribute())
+	const float ChangeAmount = NewValue - OldValue;
+	
+	if (ChangeAmount == 0.0f) return;
+	
+	if (Attribute == GetHealthAttribute())
 	{
+		// 알림에서 일반 회복이 실행되어도 부활하지 않도록 최초 사망을 먼저 확정합니다.
+		if (NewValue <= 0.0f && !bOutOfHealth)
+		{
+			bOutOfHealth = true;
+			OnOutOfHealth.Broadcast(ChangeAmount, OldValue, NewValue);
+		}
+
+		// 콜백 인자로 받은 값을 사용하여 중첩 효과와 이번 변경을 구분합니다.
+		OnHealthChanged.Broadcast(ChangeAmount, OldValue, NewValue);
+	}
+	else if (Attribute == GetMaxHealthAttribute())
+	{
+		const float OldHealth = GetHealth();
+		const float HealthIncrease = FMath::Max(ChangeAmount, 0.0f);
+		const float TargetHealth = bOutOfHealth ? 0.0f : FMath::Clamp(OldHealth + HealthIncrease, 0.0f, NewValue);
+		
 		// 최대 체력 값이 수정되었는데, 현재 체력이 해당 값보다 크다면 최대 체력 값에 맞게 보정합니다.
-		if (GetHealth() > NewValue)
+		if (TargetHealth != OldHealth)
 		{
 			UORAbilitySystemComponent* ASC = GetORAbilitySystemComponent();
 			check(ASC);
 
-			ASC->ApplyModToAttribute(GetHealthAttribute(), EGameplayModOp::Override, NewValue);
+			ASC->ApplyModToAttribute(GetHealthAttribute(), EGameplayModOp::Override, TargetHealth);
 		}
+		
+		OnMaxHealthChanged.Broadcast(ChangeAmount, OldValue, NewValue);
 	}
 }
 

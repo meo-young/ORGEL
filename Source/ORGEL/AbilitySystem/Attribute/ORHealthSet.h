@@ -24,14 +24,14 @@ public:
 // AttributeSet Interface
 // ─────────────────────────────────────────────────────────────
 public:
-	/** 효과 실행 전 체력 값을 저장합니다. */
+	/** 피해와 회복 효과의 적용 조건과 수치를 검사합니다. */
 	virtual bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override;
 
-	/** 실행된 피해와 회복을 체력에 반영하고 변경 이벤트를 전달합니다. */
-	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
-
-	/** 속성 변경 후 체력 상한과 체력 고갈 상태를 보정합니다. */
+	/** 체력 변경 시 사망을 확정하고, 최대 체력을 보정하며 변경 이벤트를 전달합니다. */
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+
+	/** 실행된 피해와 회복을 현재 체력에 반영합니다. */
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 
 // ─────────────────────────────────────────────────────────────
@@ -63,13 +63,13 @@ protected:
 // Attribute Events
 // ─────────────────────────────────────────────────────────────
 public:
-	/** 초기화와 피해, 회복 및 상한 보정에 따른 실제 체력 변경 정보를 전달합니다. */
+	/** 현재 체력의 실제 변화량과 변경 전후 값을 전달합니다. */
 	mutable FORAttributeEvent OnHealthChanged;
 
-	/** 최대 체력 변경 정보를 전달합니다. */
+	/** 최대 체력의 실제 변화량과 변경 전후 값을 전달합니다. */
 	mutable FORAttributeEvent OnMaxHealthChanged;
 
-	/** 체력이 고갈되는 시점을 전달합니다. */
+	/** 최초 체력 고갈 시 실제 변화량과 변경 전후 값을 전달합니다. */
 	mutable FORAttributeEvent OnOutOfHealth;
 
 
@@ -100,10 +100,5 @@ private:
 private:
 	/** 최초 사망을 확정하고 이후 피해와 회복 및 체력 증가를 차단합니다. */
 	uint8 bOutOfHealth : 1;
-
-	/** 효과 실행 전 최대 체력을 저장하여 변경 이벤트에 사용합니다. */
-	float MaxHealthBeforeAttributeChange;
-
-	/** 효과 실행 전 현재 체력을 저장하여 변경 이벤트에 사용합니다. */
-	float HealthBeforeAttributeChange;
+	
 };
