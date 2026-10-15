@@ -72,6 +72,8 @@ public:
 	/** 최초 체력 고갈 시 실제 변화량과 변경 전후 값을 전달합니다. */
 	mutable FORAttributeEvent OnOutOfHealth;
 
+	/** 유효한 피해로 감소한 체력 변화량과 변경 전후 체력을 전달합니다. */
+	mutable FORAttributeEvent OnDamageReceived;
 
 // ─────────────────────────────────────────────────────────────
 // Health Variables

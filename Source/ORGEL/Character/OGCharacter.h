@@ -79,6 +79,17 @@ private:
 	/** 행동을 중지하고 사망 애니메이션을 시작합니다. */
 	void StartDeath();
 
+	
+// ─────────────────────────────────────────────────────────────
+// Hit Feedback
+// ─────────────────────────────────────────────────────────────
+private:
+	/** 피격 색상을 최대로 적용하고 원래 색상으로 돌아가는 시간을 초기화합니다. */
+	void PlayHitFeedback();
+
+	/** 피격 후 경과 시간에 따라 머티리얼의 피격 강도를 감소시킵니다. */
+	void UpdateHitFeedback();
+	
 
 // ─────────────────────────────────────────────────────────────
 // Movement Direction
@@ -108,6 +119,22 @@ protected:
 	/** 사망 시작 시 재생하고 마지막 포즈를 유지할 몽타주를 참조합니다. */
 	UPROPERTY(EditDefaultsOnly, Category = "변수|사망")
 	TObjectPtr<UAnimMontage> DeathMontage;
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Hit Feedback Variables
+// ─────────────────────────────────────────────────────────────
+private:
+	/** 메시의 머티리얼에서 조절할 피격 강도 파라미터 이름을 지정합니다. */
+	UPROPERTY(EditDefaultsOnly, Category = "변수|피격")
+	FName HitAmountParameterName = TEXT("Hit.Amount");
+
+	/** 피격 강도가 원래 상태로 돌아가는 보간 속도를 지정합니다. */
+	UPROPERTY(EditDefaultsOnly, Category = "변수|피격", meta = (ClampMin = "0.1", UIMin = "0.1"))
+	float HitFeedbackInterpSpeed = 2.5f;
+
+	/** 현재 머티리얼에 적용된 피격 강도를 0부터 1 사이로 유지합니다. */
+	float HitAmount = 0.0f;
 	
 
 // ─────────────────────────────────────────────────────────────

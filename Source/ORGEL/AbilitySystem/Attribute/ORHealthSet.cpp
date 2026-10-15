@@ -74,13 +74,25 @@ void UORHealthSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackDat
 {
 	Super::PostGameplayEffectExecute(Data);
 	
+	// 피해를 체력에 반영한 뒤 실제 감소가 발생한 경우에만 피격을 알립니다.
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
+		const float OldHealth = GetHealth();
+		const float DamageAmount = Data.EvaluatedData.Magnitude;
+
 		SetDamage(0.0f);
-		SetHealth(FMath::Clamp(GetHealth() - Data.EvaluatedData.Magnitude, 0.0f, GetMaxHealth()));
+		SetHealth(FMath::Clamp(OldHealth - DamageAmount, 0.0f, GetMaxHealth()));
+
+		// 실제 체력 변화량과 변경 전후 체력을 전달합니다.
+		const float NewHealth = GetHealth();
+		if (DamageAmount > 0.0f && NewHealth < OldHealth)
+		{
+			OnDamageReceived.Broadcast(NewHealth - OldHealth, OldHealth, NewHealth);
+		}
 	}
 	else if (Data.EvaluatedData.Attribute == GetHealingAttribute())
 	{
+		// 회복은 피격 알림 없이 체력에 반영합니다.
 		SetHealing(0.0f);
 		SetHealth(FMath::Clamp(GetHealth() + Data.EvaluatedData.Magnitude, 0.0f, GetMaxHealth()));
 	}

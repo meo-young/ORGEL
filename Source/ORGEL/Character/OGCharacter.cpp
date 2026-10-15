@@ -28,6 +28,9 @@ void AOGCharacter::Tick(float DeltaSeconds)
 
 	// 게임플레이 어빌리티에서 참조할 이동 상태를 갱신합니다.
 	UpdateMovingTag();
+	
+	// 피격 강도를 0으로 보간하여 머티리얼을 원래 색상으로 복원합니다.
+	UpdateHitFeedback();
 }
 
 void AOGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -71,6 +74,12 @@ void AOGCharacter::BindAttributeEvents()
 	{
 		StartDeath();
 	});
+	
+	// 실제 피해가 발생했을 때 공통 머티리얼 피격 표현을 실행합니다.
+	HealthSet->OnDamageReceived.AddWeakLambda(this, [this](float, float, float)
+	{
+		PlayHitFeedback();
+	});
 }
 
 void AOGCharacter::UnbindAttributeEvents()
@@ -81,8 +90,10 @@ void AOGCharacter::UnbindAttributeEvents()
 		return;
 	}
 
-	// 이 캐릭터에 연결된 공통 사망 이벤트를 해제합니다.
-	ASC->GetSetChecked<UORHealthSet>()->OnOutOfHealth.RemoveAll(this);
+	// 이 캐릭터에 연결된 공통 사망 및 피격 이벤트를 해제합니다.
+	const UORHealthSet* HealthSet = ASC->GetSetChecked<UORHealthSet>();
+	HealthSet->OnOutOfHealth.RemoveAll(this);
+	HealthSet->OnDamageReceived.RemoveAll(this);
 }
 
 void AOGCharacter::FinishDeath()
@@ -125,9 +136,6 @@ void AOGCharacter::StartDeath()
 	ConsumeMovementInputVector();
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
-
-	// 캐릭터의 이동 상태 갱신과 조준 갱신을 중지합니다.
-	SetActorTickEnabled(false);
 	
 	// 접촉 공격과 피격 충돌을 차단하며 별도로 생성된 투사체는 유지합니다.
 	SetActorEnableCollision(false);
@@ -161,8 +169,28 @@ void AOGCharacter::StartDeath()
 	}
 
 	// 에셋이 준비되지 않은 경우에도 사망 상태가 미완료로 남지 않도록 처리합니다.
-	UE_LOG(LogTemp, Warning, TEXT("사망 몽타주를 재생하지 못해 사망을 즉시 완료합니다: %s"), *GetName());
+	UE_LOG(LogTemp, Error, TEXT("사망 몽타주를 재생하지 못해 사망을 즉시 완료합니다: %s"), *GetName());
 	FinishDeath();
+}
+
+void AOGCharacter::PlayHitFeedback()
+{
+	// 연속 피격 시에도 즉시 최대 강도로 되돌린 뒤 Tick에서 복원합니다.
+	HitAmount = 1.0f;
+	GetMesh()->SetScalarParameterValueOnMaterials(HitAmountParameterName, HitAmount);
+}
+
+void AOGCharacter::UpdateHitFeedback()
+{
+	// 피격 강도를 매 프레임 원래 상태인 0으로 보간합니다.
+	const float PreviousHitAmount = HitAmount;
+	HitAmount = FMath::FInterpTo(HitAmount, 0.0f, GetWorld()->GetDeltaSeconds(), HitFeedbackInterpSpeed);
+
+	// 값이 변한 경우에만 갱신하며 최종 0으로 복원되는 순간도 반영합니다.
+	if (HitAmount != PreviousHitAmount)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(HitAmountParameterName, HitAmount);
+	}
 }
 
 FVector AOGCharacter::GetDodgeDirection() const
