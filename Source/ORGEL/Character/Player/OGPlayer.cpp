@@ -1,5 +1,6 @@
 #include "OGPlayer.h"
 
+#include "GameplayEffectExtension.h"
 #include "Camera/OGCameraComponent.h"
 #include "Camera/OGSpringArmComponent.h"
 #include "AbilitySystem/ORAbilitySystemComponent.h"
@@ -9,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "AbilitySystem/Attribute/ORHealthSet.h"
 #include "Core/OGGameMode.h"
 #include "Interact/InteractionComponent.h"
 
@@ -145,21 +147,21 @@ void AOGPlayer::InitializeAbilitySystem()
 		return;
 	}
 	
-	// ASC를 교체하기 전에 기존 체력 세트의 구독을 해제합니다.
-	UnbindHealthEvents();
+	// ASC를 교체하기 전에 공통 및 플레이어 전용 이벤트를 해제합니다.
+	UnbindAttributeEvents();
 
 	// 소유자는 플레이어 상태로 유지하고 현재 캐릭터를 아바타로 지정합니다.
 	ASC = CastChecked<UORAbilitySystemComponent>(ORPlayerState->GetAbilitySystemComponent());
 	ASC->InitAbilityActorInfo(ORPlayerState, this);
 	
-	// 새 ASC의 체력 고갈 이벤트를 연결합니다.
-	BindHealthEvents();
+	// 공통 및 플레이어 전용 이벤트를 등록합니다.
+	BindAttributeEvents();
 }
 
 void AOGPlayer::UninitializeAbilitySystem()
 {
-	// ASC를 비우기 전에 현재 캐릭터의 체력 이벤트 구독을 해제합니다.
-	UnbindHealthEvents();
+	// ASC를 비우기 전에 공통 및 플레이어 전용 이벤트를 해제합니다.
+	UnbindAttributeEvents();
 	
 	// 이미 다른 캐릭터로 옮겨진 ASC의 아바타는 변경하지 않도록 처리합니다.
 	if (ASC && ASC->GetAvatarActor() == this)
@@ -172,6 +174,33 @@ void AOGPlayer::UninitializeAbilitySystem()
 
 	// 캐릭터의 캐시만 해제하고 플레이어 상태의 ASC는 유지합니다.
 	ASC = nullptr;
+}
+
+void AOGPlayer::BindAttributeEvents()
+{
+	// 기존 연결을 정리하고 부모의 공통 사망 이벤트를 등록합니다.
+	Super::BindAttributeEvents();
+
+	// 실행된 피해 효과에 대해 플레이어 전용 피격 무적을 부여합니다.
+	ASC->GetGameplayAttributeValueChangeDelegate(UORHealthSet::GetDamageAttribute()).AddWeakLambda(
+		this,
+		[this](const FOnAttributeChangeData& Data)
+		{
+			// 체력 변경 알림보다 먼저 무적을 부여하여 후속 피해를 차단합니다.
+			ASC->AddTimedTag(ORGameplayTags::Status_Invulnerable_Hit, 0.8f);
+		});
+}
+
+void AOGPlayer::UnbindAttributeEvents()
+{
+	// ASC 연결이 남아 있으면 플레이어 전용 피해 이벤트를 해제합니다.
+	if (ASC)
+	{
+		ASC->GetGameplayAttributeValueChangeDelegate(UORHealthSet::GetDamageAttribute()).RemoveAll(this);
+	}
+
+	// 부모에 등록된 공통 사망 이벤트도 해제합니다.
+	Super::UnbindAttributeEvents();
 }
 
 void AOGPlayer::UpdateCursorAim()

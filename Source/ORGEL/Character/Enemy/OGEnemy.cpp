@@ -24,8 +24,8 @@ void AOGEnemy::BeginPlay()
 	// 생성자에서 생성되어 자동 등록된 속성 세트를 초기화합니다.
 	ASC->InitializeAttributeSets(*InitialStatData);
 
-	// 초기 체력을 설정한 다음 사망 이벤트를 연결합니다.
-	BindHealthEvents();
+	// 부모의 공통 사망 이벤트를 등록합니다.
+	BindAttributeEvents();
 
 	Super::BeginPlay();
 }

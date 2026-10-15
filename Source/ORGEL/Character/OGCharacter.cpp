@@ -32,8 +32,8 @@ void AOGCharacter::Tick(float DeltaSeconds)
 
 void AOGCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	// 캐릭터 제거 후 체력 이벤트가 전달되지 않도록 연결을 해제합니다.
-	UnbindHealthEvents();
+	// 캐릭터가 제거되기 전에 공통 및 개별 이벤트 연결을 해제합니다.
+	UnbindAttributeEvents();
 	
 	Super::EndPlay(EndPlayReason);
 }
@@ -60,6 +60,31 @@ void AOGCharacter::UpdateMovingTag()
 	}
 }
 
+void AOGCharacter::BindAttributeEvents()
+{
+	// 파생 클래스의 연결까지 먼저 해제하여 중복 등록을 방지합니다.
+	UnbindAttributeEvents();
+
+	// 플레이어와 몬스터가 공통으로 사용하는 사망 처리를 연결합니다.
+	const UORHealthSet* HealthSet = ASC->GetSetChecked<UORHealthSet>();
+	HealthSet->OnOutOfHealth.AddWeakLambda(this, [this](float, float, float)
+	{
+		StartDeath();
+	});
+}
+
+void AOGCharacter::UnbindAttributeEvents()
+{
+	// ASC 연결 전이나 해제 후에는 정리할 이벤트가 없으므로 생략합니다.
+	if (!ASC)
+	{
+		return;
+	}
+
+	// 이 캐릭터에 연결된 공통 사망 이벤트를 해제합니다.
+	ASC->GetSetChecked<UORHealthSet>()->OnOutOfHealth.RemoveAll(this);
+}
+
 void AOGCharacter::FinishDeath()
 {
 	// 빙의가 해제된 캐릭터의 이전 애니메이션 알림을 무시합니다.
@@ -80,31 +105,6 @@ void AOGCharacter::FinishDeath()
 
 	// 실제 사망 애니메이션의 완료 시점을 전달합니다.
 	OnDeathFinished.Broadcast(this);
-}
-
-void AOGCharacter::BindHealthEvents()
-{
-	// 같은 체력 세트에 반복 연결되어도 구독은 하나만 유지합니다.
-	UnbindHealthEvents();
-
-	// 체력 고갈 알림을 캐릭터의 사망 처리에 연결합니다.
-	const UORHealthSet* HealthSet = ASC->GetSetChecked<UORHealthSet>();
-	HealthSet->OnOutOfHealth.AddWeakLambda(this, [this](float, float, float)
-	{
-		StartDeath();
-	});
-}
-
-void AOGCharacter::UnbindHealthEvents()
-{
-	// 최초 연결 전이나 플레이어의 ASC 연결 해제 후에는 구독 해제를 생략합니다.
-	if (!ASC)
-	{
-		return;
-	}
-
-	// 다른 캐릭터가 ASC의 아바타가 되었더라도 이 캐릭터의 구독은 제거합니다.
-	ASC->GetSetChecked<UORHealthSet>()->OnOutOfHealth.RemoveAll(this);
 }
 
 void AOGCharacter::StartDeath()

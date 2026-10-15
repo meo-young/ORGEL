@@ -64,6 +64,12 @@ private:
 	/** 현재 캐릭터가 소유한 아바타 연결과 활성 어빌리티를 정리합니다. */
 	void UninitializeAbilitySystem();
 
+	/** 공통 이벤트와 플레이어 전용 피격 무적 처리를 등록합니다. */
+	virtual void BindAttributeEvents() override;
+
+	/** 플레이어 전용 이벤트와 공통 이벤트 연결을 해제합니다. */
+	virtual void UnbindAttributeEvents() override;
+
 
 // ─────────────────────────────────────────────────────────────
 // Camera
@@ -78,7 +84,7 @@ private:
 // ─────────────────────────────────────────────────────────────
 public:
 	/** 사망 애니메이션 종료 시 마지막 포즈를 유지하고 완료 이벤트를 전달합니다. */
-	virtual void FinishDeath();
+	virtual void FinishDeath() override;
 
 
 // ─────────────────────────────────────────────────────────────
