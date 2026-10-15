@@ -53,4 +53,14 @@ namespace ORGameplayTags
 // ─────────────────────────────────────────────────────────────
 	// 지정한 어빌리티의 재사용 대기 상태를 구분합니다.
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Dodge, "Cooldown.Dodge");
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Room State
+// ─────────────────────────────────────────────────────────────
+	// 방의 전투 진행 상태 태그를 등록합니다.
+	UE_DEFINE_GAMEPLAY_TAG(Room_State_Unvisited, "Room.State.Unvisited");
+	UE_DEFINE_GAMEPLAY_TAG(Room_State_Spawning, "Room.State.Spawning");
+	UE_DEFINE_GAMEPLAY_TAG(Room_State_Active, "Room.State.Active");
+	UE_DEFINE_GAMEPLAY_TAG(Room_State_Cleared, "Room.State.Cleared");
 }

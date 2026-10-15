@@ -55,4 +55,14 @@ namespace ORGameplayTags
 // ─────────────────────────────────────────────────────────────
 	// 지정한 어빌리티의 재사용 대기 상태를 구분합니다.
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Dodge);
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Room State
+// ─────────────────────────────────────────────────────────────
+	// 방의 전투 진행 상태를 구분합니다.
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Room_State_Unvisited);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Room_State_Spawning);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Room_State_Active);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Room_State_Cleared);
 }
