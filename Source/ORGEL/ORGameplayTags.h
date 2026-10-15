@@ -21,6 +21,8 @@ namespace ORGameplayTags
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Moving);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Dodging);
 	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Invulnerable);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_Dead);
+	ORGEL_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Status_DeathFinished);
 	
 	
 // ─────────────────────────────────────────────────────────────

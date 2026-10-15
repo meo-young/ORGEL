@@ -19,6 +19,8 @@ namespace ORGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Status_Moving, "Status.Moving");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Dodging, "Status.Dodging");
 	UE_DEFINE_GAMEPLAY_TAG(Status_Invulnerable, "Status.Invulnerable");
+	UE_DEFINE_GAMEPLAY_TAG(Status_Dead, "Status.Dead");
+	UE_DEFINE_GAMEPLAY_TAG(Status_DeathFinished, "Status.DeathFinished");
 	
 	
 // ─────────────────────────────────────────────────────────────

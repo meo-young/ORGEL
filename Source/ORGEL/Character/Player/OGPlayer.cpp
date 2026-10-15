@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "Core/OGGameMode.h"
 #include "Interact/InteractionComponent.h"
 
 AOGPlayer::AOGPlayer(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -143,14 +144,23 @@ void AOGPlayer::InitializeAbilitySystem()
 		UninitializeAbilitySystem();
 		return;
 	}
+	
+	// ASC를 교체하기 전에 기존 체력 세트의 구독을 해제합니다.
+	UnbindHealthEvents();
 
 	// 소유자는 플레이어 상태로 유지하고 현재 캐릭터를 아바타로 지정합니다.
 	ASC = CastChecked<UORAbilitySystemComponent>(ORPlayerState->GetAbilitySystemComponent());
 	ASC->InitAbilityActorInfo(ORPlayerState, this);
+	
+	// 새 ASC의 체력 고갈 이벤트를 연결합니다.
+	BindHealthEvents();
 }
 
 void AOGPlayer::UninitializeAbilitySystem()
 {
+	// ASC를 비우기 전에 현재 캐릭터의 체력 이벤트 구독을 해제합니다.
+	UnbindHealthEvents();
+	
 	// 이미 다른 캐릭터로 옮겨진 ASC의 아바타는 변경하지 않도록 처리합니다.
 	if (ASC && ASC->GetAvatarActor() == this)
 	{
@@ -205,5 +215,14 @@ void AOGPlayer::UpdateCursorAim()
 	{
 		SetActorRotation(FRotator(0.0f, AimDirection.Rotation().Yaw, 0.0f));
 	}
+}
+
+void AOGPlayer::FinishDeath()
+{
+	// 공통 처리에서 완료 태그와 마지막 포즈를 먼저 반영합니다.
+	Super::FinishDeath();
+
+	// 사망 애니메이션이 완료된 뒤 현재 런을 종료합니다.
+	GetWorld()->GetAuthGameMode<AOGGameMode>()->EndRun();
 }
 

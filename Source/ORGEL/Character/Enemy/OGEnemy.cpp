@@ -20,6 +20,9 @@ void AOGEnemy::BeginPlay()
 	ASC->InitAbilityActorInfo(this, this);
 	ASC->AddAttributeSetSubobject(HealthSet.Get());
 	HealthSet->InitializeHealth(InitialStatData->GetMaxHealth());
+	
+	// 초기 체력을 설정한 다음 체력 고갈 이벤트를 연결합니다.
+	BindHealthEvents();
 
 	Super::BeginPlay();
 }

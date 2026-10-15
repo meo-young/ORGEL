@@ -5,7 +5,11 @@
 #include "GameFramework/Character.h"
 #include "OGCharacter.generated.h"
 
+class UORHealthSet;
+class AOGCharacter;
 class UORAbilitySystemComponent;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FORCharacterDeathEvent, AOGCharacter* /*Character*/);
 
 UCLASS()
 class ORGEL_API AOGCharacter : public ACharacter, public IAbilitySystemInterface
@@ -25,7 +29,21 @@ protected:
 
 	/** 실제 이동 상태를 게임플레이 태그에 반영합니다. */
 	virtual void Tick(float DeltaSeconds) override;
+	
+	/** 제거되는 캐릭터의 체력 이벤트 연결을 해제합니다. */
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	
+// ─────────────────────────────────────────────────────────────
+// Delegate
+// ─────────────────────────────────────────────────────────────
+public:
+	/** 체력이 고갈되어 사망 처리를 시작한 캐릭터를 전달합니다. */
+	FORCharacterDeathEvent OnDeathStarted;
+
+	/** 사망 애니메이션을 마치고 마지막 포즈를 유지하는 캐릭터를 전달합니다. */
+	FORCharacterDeathEvent OnDeathFinished;
+	
 
 // ─────────────────────────────────────────────────────────────
 // Ability System
@@ -37,6 +55,25 @@ public:
 private:
 	/** 이동 입력과 속도로 이동 상태 태그를 갱신합니다. */
 	void UpdateMovingTag();
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Death
+// ─────────────────────────────────────────────────────────────
+public:
+	/** 사망 애니메이션 종료 시 마지막 포즈를 유지하고 완료 이벤트를 전달합니다. */
+	virtual void FinishDeath();
+
+protected:
+	/** 현재 ASC의 체력 고갈 이벤트를 연결합니다. */
+	void BindHealthEvents();
+
+	/** 기존 체력 고갈 이벤트 연결을 해제합니다. */
+	void UnbindHealthEvents();
+
+private:
+	/** 행동을 중지하고 사망 애니메이션을 시작합니다. */
+	void StartDeath();
 
 
 // ─────────────────────────────────────────────────────────────
@@ -58,7 +95,16 @@ protected:
 	/** 현재 캐릭터를 아바타로 사용하는 ASC를 참조하며, 연결 해제 시 초기화합니다. */
 	UPROPERTY(Transient)
 	TObjectPtr<UORAbilitySystemComponent> ASC;
-
+	
+	
+// ─────────────────────────────────────────────────────────────
+// Death Variables
+// ─────────────────────────────────────────────────────────────
+protected:
+	/** 사망 시작 시 재생하고 마지막 포즈를 유지할 몽타주를 참조합니다. */
+	UPROPERTY(EditDefaultsOnly, Category = "변수|사망")
+	TObjectPtr<UAnimMontage> DeathMontage;
+	
 
 // ─────────────────────────────────────────────────────────────
 // Movement Direction Variables

@@ -1,6 +1,7 @@
 #include "ORAbilitySystemComponent.h"
 
 #include "GameplayEffect.h"
+#include "ORGameplayTags.h"
 
 void UORAbilitySystemComponent::NotifyAbilityActivated(FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability)
 {
@@ -216,6 +217,30 @@ void UORAbilitySystemComponent::ClearAbilityInput()
 			}
 		}
 	}
+}
+
+void UORAbilitySystemComponent::CancelAllAbilities()
+{
+	// 종료 콜백에서 어빌리티 목록이 변경되어도 순회를 유지합니다.
+	ABILITYLIST_SCOPE_LOCK();
+
+	for (const FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	{
+		const TArray<UGameplayAbility*> Instances = Spec.GetAbilityInstances();
+
+		// 
+		for (UGameplayAbility* Instance : Instances)
+		{
+			if (Instance->IsActive())
+			{
+				Instance->SetCanBeCanceled(true);
+				Instance->CancelAbility(Spec.Handle, AbilityActorInfo.Get(), Instance->GetCurrentActivationInfo(), false);
+			}
+		}
+	}
+
+	// 종료된 어빌리티에 입력이 다시 전달되지 않도록 정리합니다.
+	ClearAbilityInput();
 }
 
 bool UORAbilitySystemComponent::IsActivationGroupBlocked(EORAbilityActivationGroup Group) const
