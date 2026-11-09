@@ -41,6 +41,8 @@ void UORGameplayAbility_Dodge::ActivateAbility(FGameplayAbilitySpecHandle Handle
 	// 현재 또는 마지막 이동 입력을 사용하고 구르기 도중 방향과 속도를 변경하지 않도록 처리합니다.
 	AOGCharacter* Character = GetOGCharacterFromActorInfo();
 	const FVector Direction = Character->GetDodgeDirection();
+	Character->SetActorRotation(FRotator(0.0f, Direction.Rotation().Yaw, 0.0f));
+	
 	const float DodgeSpeed = GetORAbilitySystemComponentFromActorInfo()->GetSetChecked<UORMovementSet>()->GetMovementSpeed() * 2.0f;
 	
 	// 일반 이동 모드는 유지하고 엔진의 캡슐 충돌과 Root Motion 이동을 사용합니다.
