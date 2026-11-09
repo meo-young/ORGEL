@@ -116,6 +116,10 @@ protected:
 // Death Variables
 // ─────────────────────────────────────────────────────────────
 protected:
+	/** 피해를 받고 생존했을 때 재생할 피격 몽타주를 지정합니다. */
+	UPROPERTY(EditDefaultsOnly, Category = "변수|피격")
+	TObjectPtr<UAnimMontage> HitMontage;
+	
 	/** 사망 시작 시 재생하고 마지막 포즈를 유지할 몽타주를 참조합니다. */
 	UPROPERTY(EditDefaultsOnly, Category = "변수|사망")
 	TObjectPtr<UAnimMontage> DeathMontage;

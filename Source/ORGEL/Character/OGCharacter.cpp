@@ -75,10 +75,16 @@ void AOGCharacter::BindAttributeEvents()
 		StartDeath();
 	});
 	
-	// 실제 피해가 발생했을 때 공통 머티리얼 피격 표현을 실행합니다.
-	HealthSet->OnDamageReceived.AddWeakLambda(this, [this](float, float, float)
+	// 실제 피해가 발생하면 머티리얼 피격 효과와 피격 애니메이션을 재생합니다.
+	HealthSet->OnDamageReceived.AddWeakLambda(this, [this](float, float, float NewHealth)
 	{
 		PlayHitFeedback();
+
+		// 치명타로 시작된 사망 몽타주를 피격 몽타주가 덮어쓰지 않도록 합니다.
+		if (NewHealth > 0.0f && HitMontage)
+		{
+			PlayAnimMontage(HitMontage);
+		}
 	});
 }
 
