@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/RootMotionSource.h"
 #include "ORGameplayTags.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/Attribute/ORMovementSet.h"
 
 UORGameplayAbility_Dodge::UORGameplayAbility_Dodge()
@@ -44,13 +45,20 @@ void UORGameplayAbility_Dodge::ActivateAbility(FGameplayAbilitySpecHandle Handle
 	
 	// 일반 이동 모드는 유지하고 엔진의 캡슐 충돌과 Root Motion 이동을 사용합니다.
 	Character->ConsumeMovementInputVector();
-	MovementTask = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce(this, TEXT("DodgeMovement"), Direction, DodgeSpeed, 0.25f, false, nullptr, ERootMotionFinishVelocityMode::ClampVelocity, FVector::ZeroVector, 0.0f, true);
+	MovementTask = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce(this, TEXT("DodgeMovement"), Direction, DodgeSpeed, 0.4f, false, nullptr, ERootMotionFinishVelocityMode::ClampVelocity, FVector::ZeroVector, 0.0f, true);
 	
 	// 엔진 기본값의 마지막 프레임 전체 이동을 해제하여 지속 시간을 넘긴 거리 증가를 방지합니다.
 	// 지금까지 이동한 시간이 0.39초이고 프레임 길이가 0.04초이어도 0.01초만 이동합니다.
 	Character->GetCharacterMovement()->GetRootMotionSource(TEXT("DodgeMovement"))->Settings.UnSetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
 	MovementTask->OnFinish.AddDynamic(this, &ThisClass::K2_EndAbility);
 	MovementTask->ReadyForActivation();
+	
+	// 이동이 정상 종료된 뒤에도 남은 구르기 애니메이션을 재생합니다.
+	if (DodgeMontage)
+	{
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("DodgeMontage"), DodgeMontage, 1.0f, NAME_None, false);
+		MontageTask->ReadyForActivation();
+	}
 }
 
 void UORGameplayAbility_Dodge::EndAbility(FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

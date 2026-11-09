@@ -32,5 +32,9 @@ private:
 	/** 종료와 취소 시 구르기 이동 소스를 해제할 엔진 태스크를 보관합니다. */
 	UPROPERTY(Transient)
 	TObjectPtr<UAbilityTask_ApplyRootMotionConstantForce> MovementTask;
+	
+	/** 구르기 발동 시 재생할 애니메이션 몽타주를 지정합니다. */
+	UPROPERTY(EditDefaultsOnly, Category = "변수|구르기")
+	TObjectPtr<UAnimMontage> DodgeMontage;
 
 };
